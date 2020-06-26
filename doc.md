@@ -1,6 +1,6 @@
 ## 使用 Rust WebAssembly 0拷贝进行计算加速
 
-demo: https://github.com/aircloud/rust-wasm-demo
+demo: https://github.com/aircloud/rust-wasm-demo  
 其他资料：[入门 Rust 开发 WebAssembly](https://zhuanlan.zhihu.com/p/104299612)
 
 一般来说，使用 WebAssembly 能够在一定程度上提高性能，不过有的时候我们也许会发现，使用 WebAssembly 之后，有的时候我们不仅发现性能没有提升，反而下降了许多甚至数倍，实际上这是因为，使用 WebAssembly 需要非常谨慎，有很多细节都会大幅度影响性能，比如：
@@ -39,7 +39,7 @@ The default is 0.
 
 在这之前，我们需要有一个认知：
 
-**通过 rust 工具链编译的 wasm 代码，所有参数传入都是需要拷贝一次的，包括我们传入 ArrayBuffer 等 Buffer 类型的参数。**，这是由于 wasm 只能访问自己的线性内存，而这个拷贝，通常是我们在处理大规模计算的一个坎，有的时候虽然 wasm 计算快一点，但是拷贝的消耗还是比较大的，加之 js 有若干 v8 优化的加持，可能和 wasm 也相差不多。
+**通过 rust 工具链编译的 wasm 代码，所有参数传入都是需要拷贝一次的，包括我们传入 ArrayBuffer 等 Buffer 类型的参数。**这是由于 wasm 只能访问自己的线性内存，而这个拷贝，通常是我们在处理大规模计算的一个坎，有的时候虽然 wasm 计算快一点，但是拷贝的消耗还是比较大的，加之 js 有若干 v8 优化的加持，可能和 wasm 也相差不多。
 
 所以我们要把计算移植到 wasm 中的话，首先要解决的就是大规模数据拷贝的问题。
 
@@ -55,7 +55,7 @@ The default is 0.
 * 初始化一个 ImageData，内容随机。
 * 分别使用 js 和 WebAssembly 进行高斯模糊计算，并计算二者的时间，进行对比。
 
-这里的 demo 只是辅助进行验证改方案的可行性并且给出一个示例，并不作为一个标准的 benchmark 去对于 js 和 WebAssembly 的性能，同时，也并没有 UI 展示，计算结果输出在控制台中。
+这里的 demo 只是辅助进行验证改方案的可行性并且给出一个示例，并不作为一个标准的 benchmark 去对比 js 和 WebAssembly 的性能，同时，也并没有 UI 展示，计算结果输出在控制台中。
 
 最终笔者运行的结果为，js 比 WebAssembly 慢 30% 左右。
 
@@ -85,9 +85,9 @@ const ptr = this.wasm!.new_buffer(key, len);
 const u8Arr = new Uint8ClampedArray(this.wasm!.get_wasm_buffer(), ptr, len);
 ```
 
-这个时候，我们在 js 或 rust 任何一侧改了这个数据之后，都可以在另外一侧访问到。
+**这个时候，我们在 js 或 rust 任何一侧改了这个数据之后，都可以在另外一侧访问到。**
 
-实际上，在 js 侧的比如 ImageData 等一些对象中，也支持我们传递一个 TypedArray 进行初始化，这让我们在比如 canvas 等应用场景下，使用 wasm 分配的内存更为方便。
+实际上，在 js 侧的比如 [ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData) 等一些对象中，也支持我们传递一个 TypedArray 进行初始化，这让我们在比如 canvas 等应用场景下，使用 wasm 分配的内存更为方便。
 
 ```
 const imageData = new ImageData(u8Arr, width, height);
